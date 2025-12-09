@@ -4,6 +4,7 @@ import json
 import logging
 import os
 import time
+from dataclasses import asdict, dataclass, field
 from datetime import datetime, timezone
 from typing import Any, Dict, List
 
@@ -17,6 +18,17 @@ logging.basicConfig(
     level=logging.INFO,
     format="%(asctime)s [%(levelname)s] %(message)s",
 )
+
+
+@dataclass
+class ArticleFeed:
+    article_id: str = ""
+    title: str = ""
+    article_body: str = ""
+    source: str = ""
+    publisher: str = ""
+    publication_date: str = ""
+    recipients: List[str] = field(default_factory=list)
 
 
 GNEWS_API_URL = os.getenv("GNEWS_API_URL", "https://gnews.io/api/v4")
@@ -71,23 +83,46 @@ def enrich_articles(articles: List[Dict[str, Any]]) -> List[Dict[str, Any]]:
     return enriched
 
 
+def convert_to_article_feed(article: Dict[str, Any]) -> ArticleFeed:
+    """Convert enriched article to ArticleFeed structure."""
+    source_name = ""
+    if isinstance(article.get("source"), dict):
+        source_name = article["source"].get("name", "")
+    
+    return ArticleFeed(
+        article_id=article.get("id", ""),
+        title=article.get("title", ""),
+        article_body=article.get("full_content", "") or "",
+        source=source_name,
+        publisher="",
+        publication_date=article.get("publishedAt", ""),
+        recipients=[]
+    )
+
+
 def publish_articles(query: str, articles: List[Dict[str, Any]]) -> None:
     """Publish enriched articles to RabbitMQ."""
-    message = {
-        "query": query,
-        "fetched_at": datetime.now(timezone.utc).isoformat(),
-        "articles": articles,
-    }
     params = pika.URLParameters(RABBITMQ_URL)
     connection = pika.BlockingConnection(params)
     channel = connection.channel()
     channel.exchange_declare(exchange=RABBITMQ_EXCHANGE, exchange_type="fanout", durable=True)
-    channel.basic_publish(
-        exchange=RABBITMQ_EXCHANGE,
-        routing_key="",
-        body=json.dumps(message, ensure_ascii=False).encode("utf-8"),
-        properties=pika.BasicProperties(content_type="application/json", delivery_mode=2),
-    )
+    
+    fetched_at = datetime.now(timezone.utc).isoformat()
+    for article in articles:
+        article_feed = convert_to_article_feed(article)
+        # message = {
+        #     "query": query,
+        #     "fetched_at": fetched_at,
+        #     "article": asdict(article_feed),
+        # }
+        message = asdict(article_feed)
+        channel.basic_publish(
+            exchange=RABBITMQ_EXCHANGE,
+            routing_key="",
+            body=json.dumps(message, ensure_ascii=False).encode("utf-8"),
+            properties=pika.BasicProperties(content_type="application/json", delivery_mode=2),
+        )
+    
     connection.close()
     logging.info("Published %s articles for query='%s'", len(articles), query)
 
