@@ -1,0 +1,5 @@
+requests
+newspaper3k
+pika
+schedule
+lxml_html_clean
