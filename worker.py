@@ -33,7 +33,8 @@ class ArticleFeed:
 
 
 GNEWS_API_URL = os.getenv("GNEWS_API_URL", "https://gnews.io/api/v4")
-GNEWS_API_KEY = os.getenv("GNEWS_API_KEY", "60165e0fa0db3f16334fe9ddadc8334a")
+#GNEWS_API_KEY = os.getenv("GNEWS_API_KEY", "60165e0fa0db3f16334fe9ddadc8334a")
+GNEWS_API_KEY = os.getenv("GNEWS_API_KEY", "f409f860e5d8c3e51374a3591a07b2ea")
 RABBITMQ_URL = os.getenv(
     "RABBITMQ_URL",
     "amqp://breaking-bad:breakingBad1@35.225.79.109:5672/my-host",
