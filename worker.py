@@ -46,7 +46,7 @@ def fetch_articles(query: str, limit: int) -> List[Dict[str, Any]]:
 
 def enrich_article(url: str) -> str:
     """Download and parse the article content via newspaper3k."""
-    article = Article(url=url, language="he")
+    article = Article(url=url)
     article.download()
     article.parse()
     return article.text
