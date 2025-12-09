@@ -41,7 +41,7 @@ RABBITMQ_URL = os.getenv(
 RABBITMQ_EXCHANGE = os.getenv("RABBITMQ_EXCHANGE", "articles")
 FETCH_QUERIES = ["political", "health", "technology", "sports", "education"]
 FETCH_LIMIT = int(os.getenv("FETCH_LIMIT", "10"))
-FETCH_INTERVAL_MINUTES = int(os.getenv("FETCH_INTERVAL_MINUTES", "20"))
+FETCH_INTERVAL_MINUTES = int(os.getenv("FETCH_INTERVAL_MINUTES", "10"))
 
 
 def fetch_articles(query: str, limit: int) -> List[Dict[str, Any]]:
