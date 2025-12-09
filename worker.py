@@ -26,6 +26,7 @@ class ArticleFeed:
     title: str = ""
     article_body: str = ""
     source: str = ""
+    url: str = ""
     publisher: str = ""
     publication_date: str = ""
     recipients: List[str] = field(default_factory=list)
@@ -94,6 +95,7 @@ def convert_to_article_feed(article: Dict[str, Any]) -> ArticleFeed:
         title=article.get("title", ""),
         article_body=article.get("full_content", "") or "",
         source=source_name,
+        url=article.get("url", ""),
         publisher="",
         publication_date=article.get("publishedAt", ""),
         recipients=[]
