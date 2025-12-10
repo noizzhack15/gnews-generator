@@ -95,9 +95,9 @@ def convert_to_article_feed(article: Dict[str, Any]) -> ArticleFeed:
         article_id=article.get("id", ""),
         title=article.get("title", ""),
         article_body=article.get("full_content", "") or "",
-        source=source_name,
+        source="",
         url=article.get("url", ""),
-        publisher="",
+        publisher=source_name,
         publication_date=article.get("publishedAt", ""),
         recipients=[]
     )
